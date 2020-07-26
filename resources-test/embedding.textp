@@ -1,0 +1,7 @@
+We could create some templates.
+
+◊(defn t1 [& xs]
+   ◊ul{
+     ◊(for [x xs]
+        ◊li{x})◊
+   })◊
