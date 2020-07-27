@@ -293,8 +293,11 @@
 
                ?c))))))
 
-
+;; TODO: see if there is a way to enforce some error that are glossed over by the parser back-tracking
 (deftest anticipated-failures
   (testing "The parser doesn't allow single diamonds."
-    (is (insta/failure? (g/parser "◊ toto")))))
+    (is (insta/failure? (g/parser "◊ toto"))))
+
+  #_(testing "The parser wants tag args to be closed"
+      (g/parser "◊div { some stuff")))
 
