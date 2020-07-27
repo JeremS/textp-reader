@@ -1,4 +1,80 @@
-(ns textp.reader.alpha.grammar
+(ns ^{:author "Jeremy Schoffen",
+      :doc "
+      # Textp's grammar.
+
+      We construct here textp's grammar using instaparse. Our grammar is then constructed here in two parts:
+      - a lexical part or lexer made of regular expressions.
+      - a set of grammatical rules tyring the lexer together into the grammar.
+
+      ## The lexer.
+      Our lexer is made of regular expression constructed with the [[textp.reader.alpha.grammar/defregex]] macro
+      which uses the Regal library under the covers. We then assemble a lexer from these regular expressions
+      with the [[textp.reader.alpha.grammar/make-lexer]] macro.
+
+      For instance we could construct the following 2 rules lexer:
+
+      ```clojure
+      (def-regex number [:* :digit])
+
+      (def-regex word [:* [:class [\"a\" \"z\"]]])
+
+      (def lexer (make-lexer number word))
+
+      lexer
+      ;=> {:number {:tag :regexp
+                    :regexp #\"\\d*\"}
+           :word {:tag :regexp
+                  :regexp #\"[a-z]*\"}}
+      ```
+
+      ## The grammatical rules
+      We use the [[instaparse.combinators/ebnf]] function to produce grammatical rules. This allows use
+      to write these rules in the ebnf format.
+
+      For instance we could write the following:
+      ```clojure
+      (def rules
+        (instac/ebnf
+           \"
+           doc = (token <':'>)*
+           token = (number | word)
+           \"))
+
+      rules
+      ;=>{:doc {:tag :star
+                :parser {:tag :cat
+                         :parsers ({:tag :nt :keyword :token}
+                                  {:tag :string :string \":\" :hide true})}}
+          :token {:tag :alt
+                  :parsers ({:tag :nt :keyword :number}
+                            {:tag :nt :keyword :word})}}
+      ```
+
+      This way of writing the grammatical rules is way easier than using function combinators and still gives us
+      these rules in map form.
+
+      ## The combining trick
+      Now that we have both a lexer and and grammatical rules, we can simply merge them to have the full grammar.
+
+      We actually get a instparse parser this way:
+
+      ````clojure
+      (def parser
+        (insta/parser (merge lexer rules)
+                      :start :doc))
+
+      (parser \"abc:1:def:2:3:\")
+      ;=> [:doc
+           [:token [:word \"abc\"]]
+           [:token [:number \"1\"]]
+           [:token [:word \"def\"]]
+           [:token [:number \"2\"]]
+           [:token [:number \"3\"]]]
+      ```
+
+      With the exception of some details, this is how this namespace is made.
+      "}
+  textp.reader.alpha.grammar
   #?(:cljs (:require-macros [textp.reader.alpha.grammar :refer [def-regex make-lexer]]))
   (:require
     [clojure.set]
@@ -12,17 +88,28 @@
 
 
 ;; ---------------------------------------------------------------------------------------------------------------------
-;; utils
+;; Macro utils
 ;; ---------------------------------------------------------------------------------------------------------------------
 
 (macro/deftime
   (defmacro def-regex
+    "Macro used to short hand:
+    ```clojure
+    (def a-regex (make-regex \"a regal expression\"))
+    ```
+    into
+    ```clojure
+    (def-regex a-regex \"a regal expression\")
+    ```
+    "
     ([n xeger-expr]
      `(def-regex ~n "" ~xeger-expr))
     ([n doc xeger-expr]
      `(def ~n ~doc (regal/regex ~xeger-expr))))
 
-  (defmacro make-lexer [& regexes]
+  (defmacro make-lexer
+    "Make a sequence of named regular expression into a intaparse map of named regex rules."
+    [& regexes]
     `(into {}
            ~(vec (for [r regexes]
                    (let [kw (-> r name keyword)]
@@ -94,7 +181,6 @@
 ;; embedded
 
 (def ns-end \/)
-(def ns-separator \.)
 (def macro-reader-char \#)
 
 (def symbol-regular-char-set
@@ -212,32 +298,54 @@
   [:* :whitespace])
 
 
-(def lexer
-  (make-lexer
-    plain-text
-    escaping-char
-    any-char
-
-    text-verbatim
-    text-comment
-
-    text-symbol
-    text-e-value
-    text-e-code
-    text-t-clj
-    text-t-clj-str
-    tag-plain-text
-    text-spaces))
-
-
 ;; ---------------------------------------------------------------------------------------------------------------------
 ;; Grammar
 ;; ---------------------------------------------------------------------------------------------------------------------
+(defn hide-all
+  "Hide all rules in a instaparse grammar in its data (map) form by applying
+  [[instaparse.combinators/hide-tag]] to all values of the map."
+  [g]
+  (medley/map-vals instac/hide-tag g))
+
+
+(defn hide-rules
+  "Selectively hide rules instaparse grammar in its data (map) form. It
+  applies [[instaparse.combinators/hide-tag]] to the rules whose names are in `rule-names`."
+  [g rule-names]
+  (-> g
+      (select-keys rule-names)
+      hide-all
+      (->> (merge g))))
+
+
+(def lexer
+  "Lexer of our grammar. Its an instaparse grammar in data (map) form containing all the
+  regular expresions used in the final parser. All lexer rules are hidden by default
+  (they won't materialize as a node of a parse tree)."
+  (hide-all
+    (make-lexer
+      plain-text
+      escaping-char
+      any-char
+
+      text-verbatim
+      text-comment
+
+      text-symbol
+      text-e-value
+      text-e-code
+      text-t-clj
+      text-t-clj-str
+      tag-plain-text
+      text-spaces)))
+
+
 (def text-g
+  "Grammatical rules for top level text. Basically any character except \"◊\" or any escaped character."
   (instac/ebnf
     "
-    text          = plain-text | escaped-char
-    escaped-char = <escaping-char> any-char
+    text         = plain-text | escaped-char
+    escaped-char = escaping-char any-char
     "))
 
 
@@ -247,6 +355,12 @@
 
 
 (def verbatim-g
+  "Grammatical rule for verbatim text:
+  ```text
+  This text is normal text.
+  ◊!The text here is kept ◊verbatim!◊
+  ```
+  "
   (instac/ebnf
     "
     verbatim = <'◊!'> text-verbatim <'!◊'>
@@ -254,6 +368,12 @@
 
 
 (def comment-g
+  "Grammatical rule for commented text:
+  ```text
+  This text is normal text.
+  ◊/The text here is kept commented out/◊
+  ```
+  "
   (instac/ebnf
     "
     comment = <'◊/'> text-comment <'/◊'>
@@ -261,11 +381,21 @@
 
 
 (def embedded-g
+  "Grammatical rules descripbing clojure code embedded in text.
+  ```text
+  We can embed clojure calls: ◊(def ex 1)◊ and clojure values ◊|x|◊
+
+  Not that the embedded call syntax is mutually recursive with the tag syntax.
+  We can have :
+  ◊(def home ◊a[:href \"www.home.com\"]{Home})◊
+
+  and use it here: ◊|home|◊
+  ```"
   (instac/ebnf
     "
     embedded       = embedded-code | embedded-value
     embedded-code  = <'◊'> '(' text-e-code (tag | text-e-code )* ')' <'◊'>
-    embedded-value = <'◊|'> text-e-value                            <'|◊'>
+    embedded-value = <'◊|'> text-e-value                             <'|◊'>
     "))
 
 
@@ -274,21 +404,29 @@
 
 
 (def tag-g
+  "Grammatical rules for tag syntax.
+
+  A tag is meant to ultimately be a clojure call.
+  It starts with the character ◊ followed by a symbol then followed by arguments.
+  Arguments can be clojure arguments enclosed in brackets or text argument enclosed in braces.
+
+  Clojure arguments allow clojure code to be passed argument as embedded code which can contain other tags.
+  Text argument are block of text which can recursively contain tags and embedded code."
   (instac/ebnf
     "
     tag            = <'◊'> tag-name  tag-args* !tag-args
     tag-name       = text-symbol
-    tag-args       = <text-spaces> (tag-args-clj | tag-args-txt)
+    tag-args       = text-spaces (tag-args-clj | tag-args-txt)
 
     tag-args-clj   = sqbrk-enclosed
     sqbrk-enclosed =  '['  (clj-txt | sqbrk-enclosed | tag)* ']'
-    <clj-txt>      =  (text-t-clj | string)*
-    <string>       =  '\"' text-t-clj-str '\"'
+    clj-txt        =  (text-t-clj | string)*
+    string         =  '\"' text-t-clj-str '\"'
 
     tag-args-txt   = brk-enclosed
     brk-enclosed   = <'{'>  (tag-text | special)*         <'}'>
     tag-text       = tag-plain-text | escaped-char
-    escaped-char   = <escaping-char> any-char
+    escaped-char   = escaping-char any-char
     "))
 
 
@@ -297,7 +435,9 @@
     :tag-text
     :embedded
     :sqbrk-enclosed
-    :brk-enclosed})
+    :brk-enclosed
+    :clj-txt
+    :string})
 
 
 (def general-g
@@ -317,27 +457,20 @@
 ;; ---------------------------------------------------------------------------------------------------------------------
 ;; Assembling the parser
 ;; ---------------------------------------------------------------------------------------------------------------------
-(defn hide-all [g]
-  (medley/map-vals instac/hide-tag g))
-
-
-(defn hide-tags [g tags]
-  (-> g
-      (select-keys tags)
-      hide-all
-      (->> (merge g))))
-
-
 (def grammar-masked
+  "The set of the rule names that need to be hidden. These rules won't
+  produce nodes in the parse tree. In compiler parlance these are the node you'd find in a the syntax tree but not
+  in the abstract syntax tree."
   (clojure.set/union text-g-masked
                      embedded-g-masked
                      tag-g-masked
                      general-g-masked))
 
 
-(def grammar-rules
+(def all-grammatical-rules
+  "Merging of the lexer rules and the grammatical rules."
   (merge
-    (hide-all lexer)
+    lexer
     text-g
     verbatim-g
     comment-g
@@ -347,10 +480,13 @@
 
 
 (def grammar
-  (hide-tags grammar-rules grammar-masked))
+  "Final grammar with all the rules that need to be hidden specified as such."
+  (hide-rules all-grammatical-rules grammar-masked))
 
 
 (def parser
+  "Our parser with the starting rule specified as the `:doc` rule and the output format tree
+  set to `:enlive`."
   (insta/parser grammar
                 :start :doc
                 :output-format :enlive))
@@ -384,9 +520,14 @@
       some other text
     }
 
-    ◊auto-close   \\[]
+    ◊a-tag   []
+    {toto}
 
-    ◊|@l|◊")
+    ◊|@l|◊
 
-  (= (parser ex2)
-     (g/parser ex2)))
+    ◊autoc-losed-tag   \\[]")
+
+  (println ex2)
+  (parser ex2)
+  (parser "◊div{wanted to use the \\} char}")
+  (parser "\\} \\◊"))
