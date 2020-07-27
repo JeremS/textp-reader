@@ -345,7 +345,7 @@
   (instac/ebnf
     "
     text         = plain-text | escaped-char
-    escaped-char = escaping-char any-char
+    escaped-char = <escaping-char> any-char
     "))
 
 
@@ -416,7 +416,7 @@
     "
     tag            = <'◊'> tag-name  tag-args* !tag-args
     tag-name       = text-symbol
-    tag-args       = text-spaces (tag-args-clj | tag-args-txt)
+    tag-args       = <text-spaces> (tag-args-clj | tag-args-txt)
 
     tag-args-clj   = sqbrk-enclosed
     sqbrk-enclosed =  '['  (clj-txt | sqbrk-enclosed | tag)* ']'
@@ -426,7 +426,7 @@
     tag-args-txt   = brk-enclosed
     brk-enclosed   = <'{'>  (tag-text | special)*         <'}'>
     tag-text       = tag-plain-text | escaped-char
-    escaped-char   = escaping-char any-char
+    escaped-char   = <escaping-char> any-char
     "))
 
 
