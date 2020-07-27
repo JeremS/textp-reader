@@ -1,5 +1,5 @@
 (ns textp.reader.alpha.grammar
-  #?(:cljs (:require-macros [textp.reader.grammar :refer [def-regex make-lexer]]))
+  #?(:cljs (:require-macros [textp.reader.alpha.grammar :refer [def-regex make-lexer]]))
   (:require
     [clojure.set]
     [net.cgrand.macrovich :as macro :include-macros true]
@@ -240,15 +240,18 @@
     escaped-char = <escaping-char> any-char
     "))
 
+
 (def text-g-masked
   #{:text
     :escaped-char})
+
 
 (def verbatim-g
   (instac/ebnf
     "
     verbatim = <'◊!'> text-verbatim <'!◊'>
     "))
+
 
 (def comment-g
   (instac/ebnf
@@ -261,13 +264,14 @@
   (instac/ebnf
     "
     embedded       = embedded-code | embedded-value
-    embedded-code  = <'◊'> '(' text-e-code (tag |text-e-code )* ')' <'◊'>
+    embedded-code  = <'◊'> '(' text-e-code (tag | text-e-code )* ')' <'◊'>
     embedded-value = <'◊|'> text-e-value                            <'|◊'>
     "))
 
 
 (def embedded-g-masked
   #{:embedded})
+
 
 (def tag-g
   (instac/ebnf
@@ -287,12 +291,14 @@
     escaped-char   = <escaping-char> any-char
     "))
 
+
 (def tag-g-masked
   #{:tag-args
     :tag-text
     :embedded
     :sqbrk-enclosed
     :brk-enclosed})
+
 
 (def general-g
   (instac/ebnf
