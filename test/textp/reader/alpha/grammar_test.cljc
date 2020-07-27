@@ -227,9 +227,6 @@
                         ". End.")}))))
 
 
-
-
-
 (deftest escaping
   (testing "Escaping in tags"
     (let [t1 "◊t{Some text with an escaped \\}.}"
@@ -258,17 +255,17 @@
                                   {:tag :tag-args-txt, :content ("Some text with escaped bracket in args.")})})}))))
 
 
-(defn -parse [x]
+(defn parse-first [x]
   (-> x
       g/parser
       (-> :content first)))
 
 
 (def simple-addition "◊(def x (+ 1 2))◊")
-(def simple-addition-parse (-parse simple-addition))
+(def simple-addition-parse (parse-first simple-addition))
 
 (def simple-embedding "◊|x|◊")
-(def simple-embedding-parse (-parse simple-embedding))
+(def simple-embedding-parse (parse-first simple-embedding))
 
 
 
@@ -288,7 +285,7 @@
 
            (set
              (m/search
-               (-parse twisted-embedding)
+               (parse-first twisted-embedding)
                {:tag :embedded-code
                 :content (m/scan {:tag :tag
                                   :content (m/scan {:tag :tag-args-txt
