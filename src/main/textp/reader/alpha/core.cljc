@@ -1,4 +1,31 @@
-(ns textp.reader.alpha.core
+(ns ^{:author "Jeremy Schoffen"
+      :doc "
+      A reader that combine our grammar and clojure's reader to turn a string of text into
+      data clojure can then evaluate.
+
+      ## Reader results
+      The reader starts by parsing the text using our grammar then returns a *clojurized* version of the parse tree.
+
+      The different syntactic elements are processed as follows:
+
+      - text -> string
+      - tag -> clojure fn call
+      - verbatim block -> string containing the verbatim block's content.
+      - comments -> empty string or special map containing the comment depending on
+        [[textp.reader.alpha.core/*keep-comments*]]
+      - embedded clojure -> drop in clojure code or a map containing the code depending on
+        [[textp.reader.alpha.core/*wrap-embedded*]]
+
+      ## Special maps
+      The reader can wrap comment/embedded clojure in maps if indicated to. These maps have 2 keys:
+      - `type`: a marker explaining the kind of special value the map represents
+      - `data`: the actual value being wrapped, the content of a comment or the embedded clojure code.
+
+      This model is consistent with the way [https://github.com/cgrand/enlive](enlive) treats dtd elements
+      for instance. This may allow for uniform processing when outputing html for instance.
+      "}
+  textp.reader.alpha.core
+  (:refer-clojure :exclude [comment])
   (:require
     #?(:clj [clojure.tools.reader :as r]
        :cljs [cljs.tools.reader :as r])
@@ -10,7 +37,31 @@
     [textp.reader.alpha.grammar :as g]
     [textp.reader.alpha.core.error :as error]))
 
+;;----------------------------------------------------------------------------------------------------------------------
+;; Special tags
+;;----------------------------------------------------------------------------------------------------------------------
+(def comment
+  "Type of a special map for comments"
+  ::comment)
 
+
+(def embedded-code
+  "Type of a special map for embedded clojure code"
+  ::embedded-code)
+
+
+(def embedded-value
+  "Type of a special map for an embedded clojure symbol."
+  ::embedded-value)
+
+
+(def special-tags
+  "Set of the different special maps types."
+  #{comment embedded-code embedded-value})
+
+;;----------------------------------------------------------------------------------------------------------------------
+;; Parsing and reading
+;;----------------------------------------------------------------------------------------------------------------------
 (defn parse
   "Wrapper around the parser from textp.reader.grammar adding error handling."
   [text]
@@ -42,6 +93,12 @@
                       :text s
                       :region region
                       :failure e})))))))
+
+;;----------------------------------------------------------------------------------------------------------------------
+;; Clojurizing
+;;----------------------------------------------------------------------------------------------------------------------
+(def ^:dynamic *keep-comments* false)
+(def ^:dynamic *wrap-embeded* false)
 
 
 (declare clojurize)
@@ -100,17 +157,28 @@
 (defmethod clojurize* :verbatim [form]
   (-> form :content first))
 
+;; TODO: Consider keeping the comments, putting them in a tag with type comment as in enlive.
+(defmethod clojurize* :comment [comment]
+  (if-not *keep-comments*
+    ""
+    {:type comment
+     :value (:content comment)}))
 
-(defmethod clojurize* :comment [_]
-  "")
-
-
+;;TODO: Wondering if embedded values should stay wrapped in order to be treated by compilers differently.
 (defmethod clojurize* :embedded-value [form]
-  (-> form :content first read-string*))
+  (let [content (-> form :content first read-string*)]
+    (if *wrap-embeded*
+      {:type embedded-value
+       :value content}
+      content)))
 
 
 (defmethod clojurize* :embedded-code [form]
-  (clojurize-mixed (:content form)))
+  (let [content (clojurize-mixed (:content form))]
+    (if *wrap-embeded*
+      {:type embedded-code
+       :value content}
+      content)))
 
 
 (defmethod clojurize* :tag [form]
@@ -143,15 +211,37 @@
 (macro/replace
   #?(:clj {}
      :cljs {Exception :default})
-  (defn read-from-string [text]
+  (defn read-from-string* [text]
     (try
       (let [parsed (parse text)]
         (clojurize parsed))
       (catch Exception e
         (error/handle-read-error e)))))
 
+(defn read-from-string
+  "
+  Args:
+  - `text`: string we want to read
+  - `opts`: readers options
 
-(comment
+  Options:
+  - `:keep-comments`: boolean defaulting to false. Indicates to the reader to keep the comments instead of
+    replacing them by an empty-string. (see [[textp.reader.alpha.core/*keep-comments*]])
+  - `:wrap-embedded`: boolean defaulting to false. indicates to the reader to wrap the embeded clojure code/values
+    to be wrapped in a special map instead of being left as is in the result of the read.
+    (see [[textp.reader.alpha.core/*wrap-embeded*]])
+  "
+  ([text]
+   (read-from-string* text))
+  ([text opts]
+   (let [keep-comments (get opts :keep-comments ::absent)
+         wrap-embeded (get opts :wrap-embedded ::absent)]
+     (binding [*keep-comments* (and (not= keep-comments ::absent) keep-comments)
+               *wrap-embeded* (and (not= wrap-embeded ::absent) wrap-embeded)]
+       (read-from-string* text)))))
+
+
+(clojure.core/comment
   (def ex1
     "
 
@@ -171,7 +261,7 @@
  are equivalent.
 
  ◊div{\\} \\1}")
-  (read-from-string ex1)
+  (read-from-string ex1 {:wrap-embedded true})
 
   (def ex2
     "Hello my name is ◊em{Some}{Name}.
@@ -191,4 +281,4 @@
           the value x++: ◊(inc x)◊
         })◊")
   (parse ex2)
-  (read-from-string ex2))
+  (read-from-string ex2 {:wrap-embedded true}))
