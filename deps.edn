@@ -8,12 +8,20 @@
         lambdaisland/regal        {:mvn/version "0.0.89"}}
 
  :aliases {:dev {:extra-paths ["dev"]
-                 :extra-deps {org.clojure/clojure {:mvn/version "1.10.1"}
-                              nrepl/nrepl      {:mvn/version "0.7.0"}
+                 :extra-deps {nrepl/nrepl      {:mvn/version "0.7.0"}
                               cider/piggieback {:mvn/version "0.5.0"}}}
+
+           :clj {:extra-deps {org.clojure/clojure {:mvn/version "1.10.1"}}}
 
            :cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.520"}}}
 
            :test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-541"}
-                               lambdaisland/kaocha-cljs {:mvn/version "0.0-51"}}}}}
+                               lambdaisland/kaocha-cljs {:mvn/version "0.0-51"}}}
+
+           :build {:extra-paths ["scripts" "src/doc"]
+                   :extra-deps {mbt/mbt-alpha {:mvn/version "0"}
+
+                                textp/doc {:local/root "../doc"}
+                                textp/eval {:local/root "../eval"}}}}}
+

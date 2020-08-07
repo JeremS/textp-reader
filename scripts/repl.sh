@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-clojure -A:dev:test:cljs -m nrepl.cmdline
+clojure -A:clj:cljs:dev:test:build -m nrepl.cmdline
