@@ -1,0 +1,5 @@
+◊(defn template [x]
+   ◊div  [:class ◊text{class1 class2} ]
+   {
+     Some text and crazy recursion: ◊(str (+ 2 x) ◊text{times.})◊
+   })◊

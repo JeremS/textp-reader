@@ -1,0 +1,3 @@
+Clojure code (list expressions) can be embedded inside the text:
+◊(def x "some value")◊
+A symbol can be embeded this way ◊|x|◊. It's basically sugar for ◊(do x)◊
