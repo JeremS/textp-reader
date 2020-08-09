@@ -1,8 +1,9 @@
-(ns fr.jeremyschoffen.textp.reader.alpha.core.error
+(ns fr.jeremyschoffen.textp.alpha.reader.core.error
   (:require
-    [fr.jeremyschoffen.textp.reader.alpha.grammar :as g]
     [net.cgrand.macrovich :as macro :include-macros true]
-    [meander.epsilon :as m]))
+    [meander.epsilon :as m]
+    [fr.jeremyschoffen.textp.alpha.reader.grammar :as g]))
+
 
 ;; TODO: See how it might be possible when displaying an error to show the starting position of a grammatical rule failing instead of just the end.
 (def error-msgs

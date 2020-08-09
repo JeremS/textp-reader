@@ -1,21 +1,31 @@
 
 
+
 # Textp Reader
 
 This project provides a reader for a clojure dialect similar to the dialect
 of the [Racket](https://racket-lang.org/) language used in [Pollen](https://github.com/mbutterick/pollen)
 
+## Instalation
+Deps coords:
+```clojure
+#:textp{reader #:mvn{:version "0"}}
+```
+Lein coords:
+```clojure
+[textp/reader "0"]
+```
 
 ## Usage
-The idea is to have a dialect of clojure that inverse the priority of code over text in a file.
-Text is primary, code is secondary and introduced with special constructs.
+The idea is to have a dialect of clojure that inverses the priority of code over text in a file.
+Text is primary, code is secondary and introduced with special syntactic constructs.
 
-The reader (think weird list reader) considers everything plain text unless specified otherwise. We could say that the
+Here the reader considers everything plain text unless specified otherwise. We could say that the
 reader is in text mode by default. In this mode the character `◊` is the only special character.
 It announces that a special syntactic construct is going to be used.
 
 ### Embedded clojure
-The first kind of syntax is embeddded clojure:
+The first kind of syntax is embedded clojure:
 
 ```text
 Clojure code (list expressions) can be embedded inside the text:
@@ -48,7 +58,7 @@ reads as:
 
 
 ### Tags
-Like in [Pollen](https://github.com/mbutterick/pollen) we have a tag construct. We use tags simillar to what is found in [Pollen](https://github.com/mbutterick/pollen) and [Scribble](https://docs.racket-lang.org/scribble/index.html)
+Like in [Pollen](https://github.com/mbutterick/pollen) we have a tag construct. We use tags similar to what is found in [Pollen](https://github.com/mbutterick/pollen) and [Scribble](https://docs.racket-lang.org/scribble/index.html)
 We start a tag with the '◊' character followed by the tag's name and then the tag's arguments.
 
 There are 2 types of arguments:
@@ -98,7 +108,6 @@ reads as:
      "\n   "]}))]
 
 ```
-
 
 
 Assuming you have a `div` and a `text` function that can deal with this data, you can eval that

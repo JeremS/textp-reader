@@ -1,7 +1,7 @@
-(ns fr.jeremyschoffen.textp.reader.alpha.doc.lib
+(ns fr.jeremyschoffen.textp.alpha.reader.doc.lib
   (:require
-    [textp.lib.alpha.core :as textp-lib]
-    [textp.doc.alpha.core :as textp-doc]))
+    [fr.jeremyschoffen.textp.alpha.lib.core :as textp-lib]
+    [fr.jeremyschoffen.textp.alpha.doc.core :as textp-doc]))
 
 
 (textp-lib/def-xml-tag example-block)

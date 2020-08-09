@@ -1,7 +1,7 @@
-(ns fr.jeremyschoffen.textp.reader.alpha.grammar-test
+(ns fr.jeremyschoffen.textp.alpha.reader.grammar-test
   (:require
     [clojure.test :as test :refer [deftest testing is are] :include-macros true]
-    [fr.jeremyschoffen.textp.reader.alpha.grammar :as g]
+    [fr.jeremyschoffen.textp.alpha.reader.grammar :as g]
     [instaparse.core :as insta]
     [instaparse.combinators :as instac]
     [meander.epsilon :as m :include-macros true]
@@ -15,8 +15,6 @@
         grammar {n        (instac/cat (instac/nt :regex-r) ending-c)
                  :regex-r (instac/regexp regex)}]
     (insta/parser grammar :start n)))
-
-
 
 
 ;; ---------------------------------------------------------------------------------------------------------------------

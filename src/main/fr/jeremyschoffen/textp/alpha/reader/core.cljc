@@ -24,7 +24,7 @@
       This model is consistent with the way [https://github.com/cgrand/enlive](enlive) treats dtd elements
       for instance. This may allow for uniform processing when generating html for instance.
       "}
-  fr.jeremyschoffen.textp.reader.alpha.core
+  fr.jeremyschoffen.textp.alpha.reader.core
   (:refer-clojure :exclude [comment])
   (:require
     #?(:clj [clojure.tools.reader :as r]
@@ -34,8 +34,8 @@
     [instaparse.core :as insta]
     [meander.epsilon :as m]
 
-    [fr.jeremyschoffen.textp.reader.alpha.grammar :as g]
-    [fr.jeremyschoffen.textp.reader.alpha.core.error :as error]))
+    [fr.jeremyschoffen.textp.alpha.reader.grammar :as g]
+    [fr.jeremyschoffen.textp.alpha.reader.core.error :as error]))
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ;; Special tags

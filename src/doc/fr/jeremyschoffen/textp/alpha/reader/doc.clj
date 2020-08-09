@@ -1,18 +1,18 @@
-(ns fr.jeremyschoffen.textp.reader.alpha.doc
+(ns fr.jeremyschoffen.textp.alpha.reader.doc
   (:require
     [clojure.java.io :as io]
-    [textp.compile.alpha.core :refer [emit!]]
-    [textp.lib.alpha.input :as tp-lib-input]
-    [textp.doc.alpha.markdown-compiler :as compiler]
-    [textp.eval.alpha.core :as textp-eval]
-    [textp.eval.alpha.env.clojure]
-    [fr.jeremyschoffen.textp.reader.alpha.core :as textp-reader]))
+    [fr.jeremyschoffen.textp.alpha.compile.core :refer [emit!]]
+    [fr.jeremyschoffen.textp.alpha.lib.input :as tp-lib-input]
+    [fr.jeremyschoffen.textp.alpha.doc.markdown-compiler :as compiler]
+    [fr.jeremyschoffen.textp.alpha.eval.core :as textp-eval]
+    [fr.jeremyschoffen.textp.alpha.eval.env.clojure]
+    [fr.jeremyschoffen.textp.alpha.reader.core :as textp-reader]))
 
 
 
 
 (defn evil [doc]
-  (textp-eval/eval-doc-in-temp-ns doc textp.eval.alpha.env.clojure/default))
+  (textp-eval/eval-doc-in-temp-ns doc fr.jeremyschoffen.textp.alpha.eval.env.clojure/default))
 
 
 (defn read-resource [r]
@@ -60,13 +60,13 @@
 
 (defn make-readme! [project-coords]
   (tp-lib-input/with-input {:project/coords project-coords}
-    (make-doc! "fr/jeremyschoffen/textp/reader/alpha/doc/readme/README.md.tp" "README.md")))
+    (make-doc! "fr/jeremyschoffen/textp/alpha/reader/doc/readme/README.md.tp" "README.md")))
 
 (comment
 
   (make-readme! '{textp/reader {:mvn/version "1"}})
 
-  (-> "fr/jeremyschoffen/textp/reader/alpha/doc/readme/README.md.tp"
+  (-> "fr/jeremyschoffen/textp/alpha/reader/doc/readme/README.md.tp"
       io/resource
       slurp
       textp-reader/read-from-string
