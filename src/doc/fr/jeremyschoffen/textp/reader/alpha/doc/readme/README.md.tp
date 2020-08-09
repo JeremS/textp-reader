@@ -1,3 +1,4 @@
+◊(require '[textp.doc.alpha.tags :as tp-doc-tags])◊
 ◊(require '[textp.reader.alpha.doc.lib :as lib])◊
 
 # Textp Reader
@@ -5,6 +6,8 @@
 This project provides a reader for a clojure dialect similar to the dialect
 of the ◊lib/racket language used in ◊lib/pollen\.
 
+## Instalation
+◊tp-doc-tags/project-coords
 
 ## Usage
 The idea is to have a dialect of clojure that inverses the priority of code over text in a file.
@@ -17,11 +20,11 @@ It announces that a special syntactic construct is going to be used.
 ### Embedded clojure
 The first kind of syntax is embedded clojure:
 
-◊lib/example-block[:resource "textp/reader/alpha/doc/readme/example-1.tp"]
+◊lib/example-block[:resource "fr/jeremyschoffen/textp/reader/alpha/doc/readme/example-1.tp"]
 
 
 ### Special text
-◊lib/example-block[:resource "textp/reader/alpha/doc/readme/example-2.tp"]
+◊lib/example-block[:resource "fr/jeremyschoffen/textp/reader/alpha/doc/readme/example-2.tp"]
 
 
 ### Tags
@@ -35,14 +38,13 @@ There are 2 types of arguments:
 constructs presented before.
 
 For instance we could have html links.
-◊lib/example-block[:resource "textp/reader/alpha/doc/readme/example-3.tp"]
+◊lib/example-block[:resource "fr/jeremyschoffen/textp/reader/alpha/doc/readme/example-3.tp"]
 
 The way the reader is implemented allows for recursion inside syntactic constructs. When in text mode we can use
 embedded code and tags. In clojure mode we can use tags giving us access again to text mode vi text arguments.
 
 This is valid for the reader.
-◊lib/example-block[:type "text" :resource "textp/reader/alpha/doc/readme/example-4.tp"]
-
+◊lib/example-block[:type "text" :resource "fr/jeremyschoffen/textp/reader/alpha/doc/readme/example-4.tp"]
 
 Assuming you have a `div` and a `text` function that can deal with this data, you can eval that
 in a repl. I personnaly find that pretty neat...
@@ -52,5 +54,5 @@ Note that the previous example shows that we can have any manner of spaces betwe
 
 This creates the case where I might want to use a opening bracket directly after a tag.
 There are several corner case like this one. We then allow for escaped characters in the syntax.
-◊lib/example-block[:resource "textp/reader/alpha/doc/readme/example-5.tp"]
+◊lib/example-block[:resource "fr/jeremyschoffen/textp/reader/alpha/doc/readme/example-5.tp"]
 

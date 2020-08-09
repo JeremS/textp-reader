@@ -74,8 +74,8 @@
 
       With the exception of some details, this is how this namespace is made.
       "}
-  textp.reader.alpha.grammar
-  #?(:cljs (:require-macros [textp.reader.alpha.grammar :refer [def-regex make-lexer]]))
+  fr.jeremyschoffen.textp.reader.alpha.grammar
+  #?(:cljs (:require-macros [fr.jeremyschoffen.textp.reader.alpha.grammar :refer [def-regex make-lexer]]))
   (:require
     [clojure.set]
     [net.cgrand.macrovich :as macro :include-macros true]

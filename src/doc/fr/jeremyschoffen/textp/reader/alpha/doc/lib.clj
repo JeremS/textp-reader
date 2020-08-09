@@ -1,4 +1,4 @@
-(ns textp.reader.alpha.doc.lib
+(ns fr.jeremyschoffen.textp.reader.alpha.doc.lib
   (:require
     [textp.lib.alpha.core :as textp-lib]
     [textp.doc.alpha.core :as textp-doc]))

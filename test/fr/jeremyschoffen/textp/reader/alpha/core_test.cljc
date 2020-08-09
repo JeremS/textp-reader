@@ -1,8 +1,8 @@
-(ns textp.reader.alpha.core-test
+(ns fr.jeremyschoffen.textp.reader.alpha.core-test
   (:require
     [clojure.test :as test :refer [deftest testing is are] :include-macros true]
-    [textp.reader.alpha.core :as c]
-    [textp.reader.alpha.utils :as u :include-macros true]))
+    [fr.jeremyschoffen.textp.reader.alpha.core :as c]
+    [fr.jeremyschoffen.textp.reader.alpha.utils :as u :include-macros true]))
 
 
 (def ex1-str (u/get-resource "resources-test/ex1.textp"))

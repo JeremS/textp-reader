@@ -1,6 +1,6 @@
 (ns ^{:author "Jeremy Schoffen"
       :doc "
-      A reader that combine our grammar and clojure's reader to turn a string of text into
+      This namespaces provides a reader that combines our grammar and clojure's reader to turn a string of text into
       data clojure can then evaluate.
 
       ## Reader results
@@ -22,9 +22,9 @@
       - `data`: the actual value being wrapped, the content of a comment or the embedded clojure code.
 
       This model is consistent with the way [https://github.com/cgrand/enlive](enlive) treats dtd elements
-      for instance. This may allow for uniform processing when outputing html for instance.
+      for instance. This may allow for uniform processing when generating html for instance.
       "}
-  textp.reader.alpha.core
+  fr.jeremyschoffen.textp.reader.alpha.core
   (:refer-clojure :exclude [comment])
   (:require
     #?(:clj [clojure.tools.reader :as r]
@@ -34,8 +34,8 @@
     [instaparse.core :as insta]
     [meander.epsilon :as m]
 
-    [textp.reader.alpha.grammar :as g]
-    [textp.reader.alpha.core.error :as error]))
+    [fr.jeremyschoffen.textp.reader.alpha.grammar :as g]
+    [fr.jeremyschoffen.textp.reader.alpha.core.error :as error]))
 
 ;;----------------------------------------------------------------------------------------------------------------------
 ;; Special tags
@@ -138,7 +138,7 @@
                 form))
 
 (defn clojurize-mixed
-  "The basic content of an embeded code block is a sequence of strings and tags. These tags can't be read by
+  "The basic content of an embedded code block is a sequence of strings and tags. These tags can't be read by
   the clojure reader.
 
   To turn that block into clojure data, the trick is to replace the tags by place-holder strings that will be read as
@@ -157,14 +157,14 @@
 (defmethod clojurize* :verbatim [form]
   (-> form :content first))
 
-;; TODO: Consider keeping the comments, putting them in a tag with type comment as in enlive.
+
 (defmethod clojurize* :comment [comment]
   (if-not *keep-comments*
     ""
     {:type comment
      :value (:content comment)}))
 
-;;TODO: Wondering if embedded values should stay wrapped in order to be treated by compilers differently.
+
 (defmethod clojurize* :embedded-value [form]
   (let [content (-> form :content first read-string*)]
     (if *wrap-embeded*
@@ -218,11 +218,12 @@
       (catch Exception e
         (error/handle-read-error e)))))
 
+
 (defn read-from-string
   "
   Args:
   - `text`: string we want to read
-  - `opts`: readers options
+  - `opts`: a :map specifying options
 
   Options:
   - `:keep-comments`: boolean defaulting to false. Indicates to the reader to keep the comments instead of

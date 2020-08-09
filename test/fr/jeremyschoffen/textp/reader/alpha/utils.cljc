@@ -1,4 +1,4 @@
-(ns textp.reader.alpha.utils
+(ns fr.jeremyschoffen.textp.reader.alpha.utils
   (:require [net.cgrand.macrovich :as macro]))
 
 

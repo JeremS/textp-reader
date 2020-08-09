@@ -1,6 +1,6 @@
-(ns textp.reader.alpha.core.error
+(ns fr.jeremyschoffen.textp.reader.alpha.core.error
   (:require
-    [textp.reader.alpha.grammar :as g]
+    [fr.jeremyschoffen.textp.reader.alpha.grammar :as g]
     [net.cgrand.macrovich :as macro :include-macros true]
     [meander.epsilon :as m]))
 

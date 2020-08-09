@@ -1,7 +1,7 @@
-(ns textp.reader.alpha.grammar-test
+(ns fr.jeremyschoffen.textp.reader.alpha.grammar-test
   (:require
     [clojure.test :as test :refer [deftest testing is are] :include-macros true]
-    [textp.reader.alpha.grammar :as g]
+    [fr.jeremyschoffen.textp.reader.alpha.grammar :as g]
     [instaparse.core :as insta]
     [instaparse.combinators :as instac]
     [meander.epsilon :as m :include-macros true]
