@@ -1,6 +1,6 @@
-(ns fr.jeremyschoffen.textp.alpha.reader.doc.lib
+(ns docs.tags
   (:require
-    [fr.jeremyschoffen.textp.alpha.lib.core :as textp-lib]
+    [fr.jeremyschoffen.textp.alpha.lib.tag-utils :as textp-lib]
     [fr.jeremyschoffen.textp.alpha.doc.core :as textp-doc]))
 
 

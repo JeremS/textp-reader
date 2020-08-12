@@ -1,0 +1,65 @@
+◊(require '[fr.jeremyschoffen.textp.alpha.doc.tags :as doc-tags])◊
+◊(require '[docs.tags :as t])◊
+
+# Textp Reader
+
+This project provides a reader for a clojure dialect similar to the dialect
+of the ◊t/racket language used in ◊t/pollen\.
+
+## Installation
+◊doc-tags/project-coords
+
+## Usage
+The idea is to have a dialect of clojure that inverses the priority of code over text in a file.
+Text is primary, code is secondary and introduced with special syntactic constructs.
+
+Since the reader considers everything plain text unless specified otherwise, we could say that the
+reader is in *text mode* by default. In this mode the character `\◊` is the only special character.
+It announces that a special syntactic construct is going to be used, putting the reader in *clojure mode*.
+
+### Embedded clojure
+The first kind of syntax is embedded clojure:
+
+◊t/example-block[:resource "docs/readme/example-1.tp"]
+
+
+### Special text
+◊t/example-block[:resource "docs/readme/example-2.tp"]
+
+
+### Tags
+Like in ◊t/pollen we have a tag construct. We use tags similarly to what is found in ◊t/pollen and ◊t/scribble\.
+A tag starts with the '\◊' character followed by the tag's name and then the any number of tag arguments.
+
+There are 2 types of arguments:
+- clojure arguments enclosed in brackets, it's understood that the enclosed text is clojure code.
+ It effectively gives use vectors of clojure arguments.
+- text arguments enclosed in braces. The text enclosed there is normal text that can include any of the syntax
+constructs presented before.
+
+For instance we could have html links.
+◊t/example-block[:resource "docs/readme/example-3.tp"]
+
+The way the reader is implemented allows for recursion inside syntactic constructs. When in *text mode* we can use
+embedded code and tags. In *clojure mode* we can use tags giving us access again to text mode via text arguments.
+
+This is valid for the reader.
+◊t/example-block[:resource "docs/readme/example-4.tp"]
+
+Assuming you have a `div` and a `text` function that can deal with this data, you can eval that
+in a repl. I personnaly find that pretty neat...
+
+### Special cases
+Note that the previous example shows that we can have any manner of spaces between tag arguments.
+
+This creates the case where one might want to use a opening bracket directly after a tag. This bracket might be
+considered as the beginning of clojure arguments to the tag.
+
+There are several corner case like this one. We then allow for escaped characters in the syntax.
+◊t/example-block[:resource "docs/readme/example-5.tp"]
+
+## License
+
+Copyright ◊doc-tags/copyright-char 2018-2020 Jeremy Schoffen.
+
+Distributed under the Eclipse Public License 2.0.

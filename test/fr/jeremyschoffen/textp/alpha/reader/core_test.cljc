@@ -1,6 +1,7 @@
 (ns fr.jeremyschoffen.textp.alpha.reader.core-test
   (:require
-    [clojure.test :as test :refer [deftest testing is are] :include-macros true]
+    #?(:clj [clojure.test :as test :refer [deftest testing is are]]
+       :cljs [cljs.test :as test :refer-macros [deftest testing is are]])
     [fr.jeremyschoffen.textp.alpha.reader.core :as c]
     [fr.jeremyschoffen.textp.alpha.reader.utils :as u :include-macros true]))
 

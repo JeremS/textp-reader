@@ -1,0 +1,3 @@
+◊br \[
+
+the [ character won't count as the opening of clojure arguments. Also \◊ doesn't start any syntactic rule.
