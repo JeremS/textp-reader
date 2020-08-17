@@ -8,7 +8,9 @@
 
 
 (st/instrument
-  `[mbt-core/deps-make-coord])
+  `[mbt-core/deps-make-coord
+    mbt-defaults/build-jar!
+    mbt-defaults/install!])
 
 
 (def specific-conf (sorted-map
@@ -38,9 +40,6 @@
 
 
 (comment
-  (-> conf
-      (u/assoc-computed :project/version (comp str mbt-defaults/anticipated-next-version))
-      make-docs!)
   (new-milestone! conf)
 
   (mbt-core/clean! conf)
