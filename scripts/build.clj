@@ -15,11 +15,11 @@
                      :project/author "Jeremy Schoffen"
                      :maven/group-id 'fr.jeremyschoffen.textp
                      :versioning/major :alpha
-                     :versioning/scheme mbt-defaults/simple-scheme
+                     :versioning/scheme mbt-defaults/git-distance-scheme
 
-                     :project/licenses [{:project.licence/name "Eclipse Public License - v 2.0"
-                                         :project.licence/url "https://www.eclipse.org/legal/epl-v20.html"
-                                         :project.licence/distribution :repo
+                     :project/licenses [{:project.license/name "Eclipse Public License - v 2.0"
+                                         :project.license/url "https://www.eclipse.org/legal/epl-v20.html"
+                                         :project.license/distribution :repo
                                          :project.license/file (u/safer-path "LICENSE")}]))
 
 
