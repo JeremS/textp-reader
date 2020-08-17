@@ -1,11 +1,11 @@
 {:paths ["src/main"]
 
- :deps {instaparse                {:mvn/version "1.4.10"}
-        org.clojure/tools.reader  {:mvn/version "1.3.2"}
-        meander/epsilon           {:mvn/version "RELEASE"}
-        medley                    {:mvn/version "1.3.0"}
-        net.cgrand/macrovich      {:mvn/version "0.2.1"}
-        lambdaisland/regal        {:mvn/version "0.0.89"}}
+ :deps {instaparse/instaparse    {:mvn/version "1.4.10"}
+        org.clojure/tools.reader {:mvn/version "1.3.2"}
+        meander/epsilon          {:mvn/version "RELEASE"}
+        medley/medley            {:mvn/version "1.3.0"}
+        net.cgrand/macrovich     {:mvn/version "0.2.1"}
+        lambdaisland/regal       {:mvn/version "0.0.89"}}
 
  :aliases {:dev {:extra-paths ["dev"]
                  :extra-deps {nrepl/nrepl      {:mvn/version "0.7.0"}
