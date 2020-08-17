@@ -139,6 +139,6 @@ reads as:
 
 ## License
 
-Copyright &copy; 2018-2020 Jeremy Schoffen.
+Copyright &copy; 2020 Jeremy Schoffen.
 
 Distributed under the Eclipse Public License 2.0.
