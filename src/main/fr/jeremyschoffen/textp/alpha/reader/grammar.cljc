@@ -184,7 +184,7 @@
 (def macro-reader-char \#)
 
 (def symbol-regular-char-set
-  (into #{:whitespace diamond ns-end} all-delimitors))
+  (into #{:whitespace diamond ns-end escaper} all-delimitors))
 
 (def symbol-regular-char
   "Characters that are always forbidden in symbol names:
@@ -192,7 +192,8 @@
   - diamond char since it starts another grammatical rule
   - delimitors: parens, brackets, braces  and double quotes.
   - `/` since it the special meaning of separating the namespace from the symbol name.
-  - `.` since it has the special meaning of separating symbol names."
+  - `.` since it has the special meaning of separating symbol names.
+  - `\\` since it is reserved by clojure to identify a literal character."
   (into [:not ] symbol-regular-char-set))
 
 
@@ -317,27 +318,30 @@
       hide-all
       (->> (merge g))))
 
+(def lexer*
+  "Raw lexer of our grammar. It's an instaparse grammar in data (map) form containing all the
+  regular expressions used in the final parser."
+  (make-lexer
+    plain-text
+    escaping-char
+    any-char
+
+    text-verbatim
+    text-comment
+
+    text-symbol
+    text-e-value
+    text-e-code
+    text-t-clj
+    text-t-clj-str
+    tag-plain-text
+    text-spaces))
 
 (def lexer
-  "Lexer of our grammar. Its an instaparse grammar in data (map) form containing all the
-  regular expresions used in the final parser. All lexer rules are hidden by default
+  "Lexer of our grammar. Its the raw lexer with all rules are hidden by default
   (they won't materialize as a node of a parse tree)."
-  (hide-all
-    (make-lexer
-      plain-text
-      escaping-char
-      any-char
+  (hide-all lexer*))
 
-      text-verbatim
-      text-comment
-
-      text-symbol
-      text-e-value
-      text-e-code
-      text-t-clj
-      text-t-clj-str
-      tag-plain-text
-      text-spaces)))
 
 
 (def text-g
@@ -493,6 +497,10 @@
 
 
 (comment
+  (def full-parser
+    (insta/parser all-grammatical-rules
+                  :start :doc))
+
   (def ex1
     "Hello my name is ◊em{Jeremy}{Schoffen}.
      We can embed code ◊(+ 1 2 3)◊.
@@ -529,5 +537,7 @@
 
   (println ex2)
   (parser ex2)
+  (parser "◊|poll\\en|◊.")
+  (parser "◊pollen\\.")
   (parser "◊div{wanted to use the \\} char}")
   (parser "\\} \\◊"))
