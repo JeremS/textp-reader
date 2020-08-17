@@ -4,16 +4,16 @@
 # Textp Reader
 
 This project provides a reader for a clojure dialect similar to the dialect
-of the [Racket](https://racket-lang.org/) language used in [Pollen](https://github.com/mbutterick/pollen)
+of the [Racket](https://racket-lang.org/) language used in [Pollen](https://github.com/mbutterick/pollen).
 
 ## Installation
 Deps coords:
 ```clojure
-#:fr.jeremyschoffen.textp{reader-alpha #:mvn{:version "0"}}
+#:fr.jeremyschoffen.textp{reader-alpha #:mvn{:version "0-unstable"}}
 ```
 Lein coords:
 ```clojure
-[fr.jeremyschoffen.textp/reader-alpha "0"]
+[fr.jeremyschoffen.textp/reader-alpha "0-unstable"]
 ```
 
 ## Usage
@@ -58,7 +58,7 @@ reads as:
 
 
 ### Tags
-Like in [Pollen](https://github.com/mbutterick/pollen) we have a tag construct. We use tags similarly to what is found in [Pollen](https://github.com/mbutterick/pollen) and [Scribble](https://docs.racket-lang.org/scribble/index.html)
+Like in [Pollen](https://github.com/mbutterick/pollen) we have a tag construct. We use tags similarly to what is found in [Pollen](https://github.com/mbutterick/pollen) and [Scribble](https://docs.racket-lang.org/scribble/index.html).
 A tag starts with the '◊' character followed by the tag's name and then the any number of tag arguments.
 
 There are 2 types of arguments:
