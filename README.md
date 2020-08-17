@@ -9,11 +9,11 @@ of the [Racket](https://racket-lang.org/) language used in [Pollen](https://gith
 ## Installation
 Deps coords:
 ```clojure
-#:fr.jeremyschoffen.textp{reader-alpha #:mvn{:version "0-unstable"}}
+#:fr.jeremyschoffen{textp-reader-alpha #:mvn{:version "0-unstable"}}
 ```
 Lein coords:
 ```clojure
-[fr.jeremyschoffen.textp/reader-alpha "0-unstable"]
+[fr.jeremyschoffen/textp-reader-alpha "0-unstable"]
 ```
 
 ## Usage
