@@ -41,6 +41,7 @@
 
 
 (comment
+  (str  (mbt-defaults/anticipated-next-version conf))
   (new-milestone! conf)
 
   (mbt-core/clean! conf)

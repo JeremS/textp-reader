@@ -7,19 +7,22 @@
         net.cgrand/macrovich     {:mvn/version "0.2.1"}
         lambdaisland/regal       {:mvn/version "0.0.89"}}
 
- :aliases {:dev {:extra-paths ["dev"]
-                 :extra-deps {nrepl/nrepl      {:mvn/version "0.7.0"}
-                              cider/piggieback {:mvn/version "0.5.0"}}}
-
-           :clj {:extra-deps {org.clojure/clojure {:mvn/version "1.10.1"}}}
+ :aliases {:clj {:extra-deps {org.clojure/clojure {:mvn/version "1.10.1"}}}
 
            :cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.520"}}}
+
+           :dev {:extra-paths ["dev"]}
+
+           :nrepl  {:extra-deps {nrepl/nrepl      {:mvn/version "0.7.0"}}}
+
+           :piggie {:extra-deps {cider/piggieback {:mvn/version "0.5.0"}}}
+
 
            :test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-541"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-51"}}}
 
-           :build {:extra-paths ["scripts" "src/doc"]
-                   :extra-deps {fr.jeremyschoffen/mbt-alpha-unstable {:mvn/version "2"}
-                                fr.jeremyschoffen/textp-doc-alpha {:local/root "../doc"}}}}}
+           :build {:paths ["scripts" "src/doc"]
+                   :deps {fr.jeremyschoffen/mbt-alpha-unstable {:mvn/version "8"}
+                          fr.jeremyschoffen/textp-doc-alpha {:local/root "../doc"}}}}}
 
