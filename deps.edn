@@ -1,7 +1,7 @@
 {:paths ["src/main"]
 
  :deps {instaparse/instaparse    {:mvn/version "1.4.10"}
-        org.clojure/tools.reader {:mvn/version "1.3.2"}
+        org.clojure/tools.reader {:mvn/version "1.3.3"}
         meander/epsilon          {:mvn/version "RELEASE"}
         medley/medley            {:mvn/version "1.3.0"}
         net.cgrand/macrovich     {:mvn/version "0.2.1"}

@@ -43,21 +43,21 @@
    g/text-spaces
    "The parser expect spaces only."})
 
+
 (defn get-normalized-error-data [e]
   (letfn [(extract-reason [insta-reason]
             (m/search insta-reason
-                      (m/scan (and ?x {:tag :regexp
-                                       :expecting ?regex}))
-                      (get error-msgs ?regex ?x)
+              (m/scan ?x)
+              (m/match ?x
+                {:tag       :regexp
+                 :expecting ?regex}
+                (get error-msgs ?regex ?x)
 
-                      (m/scan (and ?x {:tag (m/pred (complement =) :regexp)}))
-                      ?x
-
-                      (m/scan (and ?x (m/pred (complement map?))))
-                      ?x))]
+                _
+                ?x)))]
 
     (m/match (ex-data e)
-             {:type :reader-failure
+             {:type ::clojure-reader-error
               :text ?text
               :failure ?f
               :region #:instaparse.gll{:start-index  ?start-index
@@ -66,7 +66,8 @@
                                        :start-column ?start-column
                                        :end-line     ?end-line
                                        :end-column   ?end-column}}
-             {:type :reader-failure
+             {:type ::clojure-reader-error
+              :failure ?f
               :start-index  ?start-index
               :end-index    ?end-index
               :start-line   ?start-line
@@ -77,13 +78,14 @@
               :reason (ex-message ?f)}
 
 
-             {:type :parser-failure
-              :failure {:index  ?index
-                        :reason ?reason
-                        :line   ?line
-                        :column ?column
-                        :text   ?text}}
-             {:type :parser-failure
+             {:type ::grammar-error
+              :failure (m/and ?f {:index  ?index
+                                  :reason ?reason
+                                  :line   ?line
+                                  :column ?column
+                                  :text   ?text})}
+             {:type ::grammar-error
+              :failure ?f
               :end-index  ?index
               :end-line   ?line
               :end-column ?column
@@ -95,19 +97,14 @@
 
 
 (defn normalize-error [e]
-  (let [data (get-normalized-error-data e)
-        final-data (merge data
-                          (-> e
-                              ex-data
-                              (select-keys #{:type :failure})))]
-    (ex-info (ex-message e)
-             final-data)))
+  (ex-info (ex-message e)
+           (get-normalized-error-data e)))
 
 
 (defn print-base-error-msg [e]
   (println (ex-message e))
   (let [{:keys [type reason failure]} (ex-data e)]
-    (if (= type :reader-failure)
+    (if (= type ::clojure-reader-error)
       (println reason)
       (do
         (println "Doesn't respect the following:")
@@ -124,7 +121,7 @@
                 start-line start-column
                 end-line end-column]} (ex-data error)]
     (println "Region:")
-    (if (= type :reader-failure)
+    (if (= type ::clojure-reader-error)
       (do
         (println "From indexes" start-index "to" end-index)
         (println "line" start-line "column" start-column

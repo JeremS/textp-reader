@@ -32,7 +32,7 @@
     [clojure.walk :as walk]
     [net.cgrand.macrovich :as macro :include-macros true]
     [instaparse.core :as insta]
-    [meander.epsilon :as m]
+    [medley.core :as medley]
 
     [fr.jeremyschoffen.textp.alpha.reader.grammar :as g]
     [fr.jeremyschoffen.textp.alpha.reader.core.error :as error]))
@@ -63,12 +63,12 @@
 ;; Parsing and reading
 ;;----------------------------------------------------------------------------------------------------------------------
 (defn parse
-  "Wrapper around the parser from textp.reader.grammar adding error handling."
+  "Wrapper around the parser from [[textp.reader.grammar]] adding error handling."
   [text]
   (let [parsed (g/parser text)]
     (when (insta/failure? parsed)
       (throw (ex-info "Parser failure."
-                      {:type :parser-failure
+                      {:type ::error/grammar-error
                        :failure (insta/get-failure parsed)})))
     (insta/add-line-and-column-info-to-metadata text parsed)))
 
@@ -89,7 +89,7 @@
         (let [region *parse-region*]
           (throw
             (ex-info "Reader failure."
-                     {:type :reader-failure
+                     {:type ::error/clojure-reader-error
                       :text s
                       :region region
                       :failure e})))))))
@@ -158,11 +158,11 @@
   (-> form :content first))
 
 
-(defmethod clojurize* :comment [comment]
+(defmethod clojurize* :comment [node]
   (if-not *keep-comments*
     ""
-    {:type comment
-     :value (:content comment)}))
+    {:type  comment
+     :value (:content node)}))
 
 
 (defmethod clojurize* :embedded-value [form]
@@ -199,13 +199,23 @@
   (update form :content clojurize-mixed))
 
 
+(defn- add-parse-region-meta [form region]
+  (->> region
+       (medley/map-keys #(-> % name keyword))
+       (vary-meta form assoc ::parse-region)))
+
+
 (defn clojurize
-  "Function that turns a textp parse tree to data that clojure can eval."
+  "Function that turns a textp parse tree to data that clojure can eval.
+  clojure form that are clojurized have parse info in their metadata."
   [form]
   (if (string? form)
     form
     (binding [*parse-region* (meta form)]
-      (clojurize* form))))
+      (let [res (clojurize* form)]
+        (cond-> res
+                (not (string? res))
+                (add-parse-region-meta *parse-region*))))))
 
 
 (macro/replace
@@ -235,14 +245,23 @@
   ([text]
    (read-from-string* text))
   ([text opts]
-   (let [keep-comments (get opts :keep-comments ::absent)
-         wrap-embeded (get opts :wrap-embedded ::absent)]
-     (binding [*keep-comments* (and (not= keep-comments ::absent) keep-comments)
-               *wrap-embeded* (and (not= wrap-embeded ::absent) wrap-embeded)]
+   (let [keep-comments (get opts :keep-comments)
+         wrap-embeded (get opts :wrap-embedded)]
+     (binding [*keep-comments* (and (contains? opts :keep-comments) keep-comments)
+               *wrap-embeded* (and (contains? opts :wrap-embeded) wrap-embeded)]
        (read-from-string* text)))))
 
 
+(defn form->text
+  "Given a form and the original text, finds the part of the text that read as this form."
+  [form original]
+  (if (string? form)
+    form
+    (let [{:keys [start-index end-index]} (-> form meta ::parse-region)]
+      (subs original start-index end-index))))
+
 (clojure.core/comment
+  (read-from-string "◊/com/")
   (def ex1
     "
 
@@ -262,7 +281,11 @@
  are equivalent.
 
  ◊div{\\} \\1}")
-  (read-from-string ex1 {:wrap-embedded true})
+  (-> ex1
+      (read-from-string {:wrap-embedded true})
+      second
+      (form->text ex1))
+
 
   (def ex2
     "Hello my name is ◊em{Some}{Name}.

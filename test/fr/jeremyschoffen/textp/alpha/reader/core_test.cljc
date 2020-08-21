@@ -15,3 +15,18 @@
 
 (deftest round-trips
   (is (= simple-form (first (c/read-from-string simple-form-textp)))))
+
+
+
+(def example1
+  "some text and ◊/a comment/◊")
+
+(deftest form->text
+  (is (= "◊/a comment/◊"
+         (-> example1
+             (c/read-from-string {:keep-comments true})
+             second
+             (c/form->text example1)))))
+
+
+
