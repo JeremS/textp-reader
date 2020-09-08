@@ -9,11 +9,15 @@ of the [Racket](https://racket-lang.org/) language used in [Pollen](https://gith
 ## Installation
 Deps coords:
 ```clojure
-#:fr.jeremyschoffen{textp-reader-alpha #:mvn{:version "0"}}
+{fr.jeremyschoffen/textp-reader-alpha {:mvn/version "1"}}
 ```
 Lein coords:
 ```clojure
-[fr.jeremyschoffen/textp-reader-alpha "0"]
+[fr.jeremyschoffen/textp-reader-alpha "1"]
+```
+Git coords:
+```clojure
+{fr.jeremyschoffen/textp-reader-alpha {:git/url "https://github.com/JeremS/textp-reader", :sha "b8b53718970a88ab5feffa61e2fa42bb72d558fb"}}
 ```
 
 ## Usage
@@ -139,6 +143,6 @@ reads as:
 
 ## License
 
-Copyright &copy; 2020 Jeremy Schoffen.
+Copyright © 2020 Jeremy Schoffen.
 
 Distributed under the Eclipse Public License 2.0.
