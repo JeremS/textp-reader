@@ -1,9 +1,13 @@
-(ns docs.core
+(ns fr.jeremyschoffen.textp.alpha.reader.docs.core
   (:require
     [fr.jeremyschoffen.textp.alpha.lib.compilation :refer [emit!]]
     [fr.jeremyschoffen.textp.alpha.doc.core :as doc]
     [fr.jeremyschoffen.textp.alpha.doc.markdown-compiler :as compiler]
-    [fr.jeremyschoffen.textp.alpha.reader.core :as textp-reader]))
+    [fr.jeremyschoffen.textp.alpha.reader.core :as textp-reader]
+    [fr.jeremyschoffen.mbt.alpha.utils :as u]))
+
+(u/pseudo-nss
+  project)
 
 
 (defn emit-example! [resource]
@@ -18,7 +22,7 @@
     (compiler/emit-block! "clojure" resource)))
 
 
-(defmethod compiler/emit-tag! :example-block
+(defmethod compiler/emit-tag! [::compiler/md :example-block]
   [node]
   (let [{:keys [resource]} (get node :attrs)
         resource (doc/slurp-resource* resource)]
@@ -32,19 +36,21 @@
     (compiler/emit-newline!)))
 
 
-(def readme-src "docs/readme/README.md.tp")
-(def readme-dest "README.md")
+(def readme-src "fr/jeremyschoffen/textp/alpha/reader/docs/readme/README.md.tp")
 
 
-(defn make-readme! [maven-coords]
-  (spit readme-dest
-        (doc/make-document readme-src {:project/maven-coords maven-coords})))
+(defn make-readme! [{wd ::project/working-dir
+                     maven-coords ::project/maven-coords
+                     git-coords ::project/git-coords}]
+  (spit (u/safer-path wd "README.md")
+        (doc/make-document readme-src
+                           {:project/maven-coords maven-coords
+                            :project/git-coords git-coords})))
 
 
 (comment
   (-> readme-src
       doc/slurp-resource
       doc/read-document)
-
-  (make-readme! '{fr.jeremyschoffen/textp-doc {:mvn/version "0"}}))
+  (doc/make-document readme-src {}))
 

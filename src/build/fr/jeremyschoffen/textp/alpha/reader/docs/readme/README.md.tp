@@ -1,5 +1,5 @@
 ◊(require '[fr.jeremyschoffen.textp.alpha.doc.tags :as doc-tags])◊
-◊(require '[docs.tags :as t])◊
+◊(require '[fr.jeremyschoffen.textp.alpha.reader.docs.tags :as t])◊
 
 # Textp Reader
 
@@ -20,11 +20,11 @@ It announces that a special syntactic construct is going to be used, putting the
 ### Embedded clojure
 The first kind of syntax is embedded clojure:
 
-◊t/example-block[:resource "docs/readme/example-1.tp"]
+◊t/example-block[:resource (t/prefix-doc-path "docs/readme/example-1.tp")]
 
 
 ### Special text
-◊t/example-block[:resource "docs/readme/example-2.tp"]
+◊t/example-block[:resource (t/prefix-doc-path "docs/readme/example-2.tp")]
 
 
 ### Tags
@@ -38,13 +38,13 @@ There are 2 types of arguments:
 constructs presented before.
 
 For instance we could have html links.
-◊t/example-block[:resource "docs/readme/example-3.tp"]
+◊t/example-block[:resource (t/prefix-doc-path "docs/readme/example-3.tp")]
 
 The way the reader is implemented allows for recursion inside syntactic constructs. When in *text mode* we can use
 embedded code and tags. In *clojure mode* we can use tags giving us access again to text mode via text arguments.
 
 This is valid for the reader.
-◊t/example-block[:resource "docs/readme/example-4.tp"]
+◊t/example-block[:resource (t/prefix-doc-path "docs/readme/example-4.tp")]
 
 Assuming you have a `div` and a `text` function that can deal with this data, you can eval that
 in a repl. I personnaly find that pretty neat...
@@ -56,10 +56,10 @@ This creates the case where one might want to use a opening bracket directly aft
 considered as the beginning of clojure arguments to the tag.
 
 There are several corner case like this one. We then allow for escaped characters in the syntax.
-◊t/example-block[:resource "docs/readme/example-5.tp"]
+◊t/example-block[:resource (t/prefix-doc-path "docs/readme/example-5.tp")]
 
 ## License
 
-Copyright ◊doc-tags/copyright-char 2020 Jeremy Schoffen.
+Copyright © 2020 Jeremy Schoffen.
 
 Distributed under the Eclipse Public License 2.0.

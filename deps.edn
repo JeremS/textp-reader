@@ -22,7 +22,7 @@
                   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-541"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-51"}}}
 
-           :build {:paths ["scripts" "src/doc"]
-                   :deps {fr.jeremyschoffen/mbt-alpha-unstable {:mvn/version "8"}
-                          fr.jeremyschoffen/textp-doc-alpha {:local/root "../doc"}}}}}
+           :build {:extra-paths ["src/build" "build"]
+                   :extra-deps {fr.jeremyschoffen/mbt-alpha {:mvn/version "3"}
+                                fr.jeremyschoffen/textp-doc-alpha {:local/root "../textp-doc"}}}}}
 
